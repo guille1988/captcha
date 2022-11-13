@@ -24,7 +24,7 @@ return [
     |
     */
 
-    'secret_key' => '6Lc1QoQeAAAAAAWLsvJav14ZtVHBNmBo9geZn9d0',
+    'secret_key' => '',
 
     'test_secret_key' => '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe',
 
