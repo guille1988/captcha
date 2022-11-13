@@ -1,0 +1,28 @@
+{
+    "name": "felipetti/captcha",
+    "description": "This package is for integrating captcha service to Laravel project",
+    "minimum-stability": "stable",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Guillermo Felipetti",
+            "email": "guill388@hotmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Felipetti\\Captcha\\CaptchaServiceProvider"
+            ]
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Felipetti\\Captcha\\": "src"
+        }
+    },
+    "require": {
+        "php": "^8.1",
+        "laravel/framework": "^9.18"
+    }
+}
