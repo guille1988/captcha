@@ -82,7 +82,7 @@ class CaptchaController extends Controller
     {
         $rules  = ['captcha' => [new CaptchaVerification]];
 
-        Validator::make($request->all(), $rules)->validate();
+        Validator::make($request->only('captcha'), $rules)->validate();
 
         //...
     }
