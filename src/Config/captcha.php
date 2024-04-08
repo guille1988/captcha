@@ -20,11 +20,12 @@ return [
     | Secret Key
     |--------------------------------------------------------------------------
     |
-    | This is the CAPTCHA key that only back-end has.
+    | This is the CAPTCHA key that only back-end has, please fill it
+    | with your own.
     |
     */
 
-    'secret_key' => '6Lc1QoQeAAAAAAWLsvJav14ZtVHBNmBo9geZn9d0',
+    'secret_key' => '',
 
     'test_secret_key' => '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe',
 
