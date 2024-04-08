@@ -1,121 +1,80 @@
 <?php
 
-
 namespace Felipetti\Captcha\Rule;
 
-
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Http;
-use Felipetti\Captcha\Data\Data;
+use Felipetti\Captcha\ValueObject\Data;
 
-
-class CaptchaVerification implements Rule
+class CaptchaVerification implements ValidationRule
 {
-
-    // This has the error message of bad API uri.
-    private string $apiUriIsInvalid = 'API uri is invalid';
-
-    // This is set afterwards, to hold the actual error message, if any.
-    private string $actualErrorMessage;
-
-    // This has the config file from data class.
-    private array $config;
-
+    // This has the data required to perform all operations of the package.
+    private Data $data;
 
     /**
-     * This method charges config attribute with an instance of data class, to make the package work.
+     * This method charges data attribute with an instance of data class, to make the package work.
      */
     public function __construct()
     {
-        $this->config = app(Data::class)->getConfig();
+        $this->data = new Data;
     }
 
-
     /**
-     * This select the corresponding response of the error, according to the config file.
+     * This performs all the operations needed for the package to work.
      *
-     * @param string $errorCode
-     * @return string
-     */
-    public function getErrorMessageFromAllCodes(string $errorCode): string
-    {
-        return $this->config['error_codes'][$errorCode];
-    }
-
-
-    /**
-     * This gets secret key or test secret key, according to the config file and if the application
-     * is in production or not.
-     *
-     * @return string|NULL
-     */
-    public function getSecretKey(): ?string
-    {
-        $secretKey = $this->config['secret_key'];
-
-        return empty($this->config['enable_test_key']) ?
-            $secretKey :
-            (app()->isProduction() ? $secretKey : $this->config['test_secret_key']);
-    }
-
-
-    /**
-     * This discerns according to the error, the response message, sets it to the attribute.
-     *
-     * @param string $actualErrorMessage
+     * @param string $attribute
+     * @param mixed $value
+     * @param Closure $fail
      * @return void
      */
-    public function setActualErrorMessage(string $actualErrorMessage): void
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $this->actualErrorMessage = $actualErrorMessage;
+        $rawResponse = Http::asForm()->post($this->data->getUrl(), $this->buildData($value));
+
+        if(! $rawResponse->successful()){
+            $fail($this->data->getErrorMessage('invalid-request'));
+        }
+
+        $response = $rawResponse->json();
+
+        if(! $response['success']){
+            $errorCode = isset($response['error-codes']) ?
+                $response['error-codes'][0] :
+                'default';
+
+            $fail($this->data->getErrorMessage($errorCode));
+        }
+
+        if($this->scoreSurpassed($response)){
+            $fail($this->data->getErrorMessage('threshold-surpassed'));
+        }
     }
 
+    /**
+     * This builds the data to make a POST request to CAPTCHA.
+     *
+     * @param string $value
+     * @return array
+     */
+    private function buildData(string $value): array
+    {
+        return [
+            'secret' => $this->data->getSecretKey(),
+            'remoteip' => request()->ip(),
+            'response' => $value
+        ];
+    }
 
     /**
-     * This has the API request and the conditions to pass verifications.
+     * If it is CAPTCHA V3, it will check if the score is lower
+     * than the threshold.
      *
-     * @param $attribute
-     * @param $value
+     * @param array $response
      * @return bool
      */
-    public function passes($attribute, $value): bool
+    private function scoreSurpassed(array $response): bool
     {
-        $secret = $this->getSecretKey();
-        $url = $this->config['url'];
-        $remoteip = request()->ip();
-        $response = $value;
-
-        $data = compact(['secret', 'response', 'remoteip']);
-
-        $rawResponse = Http::asForm()->post($url, $data);
-
-        if(is_null($rawResponse->json()))
-        {
-            $this->setActualErrorMessage($this->apiUriIsInvalid);
-            return false;
-        }
-        else
-        {
-            $successResponse = $rawResponse->json('success');
-
-            if(!$successResponse)
-            {
-                $errorCode = collect($rawResponse->json('error-codes'))->first();
-                $errorMessage = $this->getErrorMessageFromAllCodes($errorCode);
-                $this->setActualErrorMessage($errorMessage);
-            }
-            return $successResponse;
-        }
-    }
-
-
-    /**
-     * This builds the error message of the package, if any.
-     *
-     * @return string
-     */
-    public function message(): string
-    {
-        return $this->actualErrorMessage;
+        return isset($response['score']) && $response['score'] < $this->data->getThreshold();
     }
 }

@@ -1,12 +1,9 @@
 <?php
 
-
 namespace Felipetti\Captcha;
 
-
-use Felipetti\Captcha\Data\Data;
+use Felipetti\Captcha\ValueObject\Data;
 use Illuminate\Support\ServiceProvider;
-
 
 class CaptchaServiceProvider extends ServiceProvider
 {

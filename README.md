@@ -2,11 +2,11 @@
 
 ## What it does:
 
-This package allows you to integrate CAPTCHA API to your Laravel application.
+This package allows you to integrate CAPTCHA V2 or V3 to your Laravel application.
 
 ## Installation:
 
-```php
+```bash
 composer require felipetti/captcha
 ```
 
@@ -14,7 +14,7 @@ composer require felipetti/captcha
 
 First you publish config file:
 
-```php
+```bash
 php artisan vendor:publish --tag=captcha
 ```
 
@@ -95,7 +95,7 @@ Explanations in config file are quite expressive, so if you have any questions, 
 
 ## Comments:
 
-This package is not for captcha V3, only V2. Please star me if you liked the package, it will really help me a lot =).
+Please star me if you liked the package, it will really help me a lot.
 
 ## Security:
 
