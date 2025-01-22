@@ -20,8 +20,8 @@ return [
     | Secret Key
     |--------------------------------------------------------------------------
     |
-    | This is the CAPTCHA key that only back-end has, please fill it
-    | with your own.
+    | This is the Captcha key that only back-end has,
+    | please fill it with your own.
     |
     */
 
@@ -34,7 +34,7 @@ return [
     | URL
     |--------------------------------------------------------------------------
     |
-    | The URL to post google to make a verification of CAPTCHA.
+    | The URL to post google to make Captcha verification.
     |
     */
 
@@ -42,10 +42,10 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Threshold (only for CAPTCHA V3)
+    | Threshold (only for Captcha V3)
     |--------------------------------------------------------------------------
     |
-    | This value is sent by CAPTCHA and represents the probability
+    | This value is sent by Captcha and represents the probability
     | of the request to be a bot, being 0.1 the lowest and 1 the highest.
     | The recommended value is 0.5, but you can customize it according
     | to your needs.
@@ -61,7 +61,7 @@ return [
     |
     | This are all error codes from the API. You can add more, customize
     | responses or remove some according to your needs. Threshold error
-    | code is only for CAPTCHA V3 and default one is a fallback if no
+    | code is only for Captcha V3 and default one is a fallback if no
     | error got matched.
     |
     */

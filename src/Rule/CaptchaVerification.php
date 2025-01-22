@@ -4,16 +4,17 @@ namespace Felipetti\Captcha\Rule;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Felipetti\Captcha\ValueObject\Data;
 
 class CaptchaVerification implements ValidationRule
 {
-    // This has the data required to perform all operations of the package.
+    // Has the data required to perform all operations of the package.
     private Data $data;
 
     /**
-     * This method charges data attribute with an instance of data class, to make the package work.
+     * Charges data attribute with an instance of data class, to make the package work.
      */
     public function __construct()
     {
@@ -27,23 +28,31 @@ class CaptchaVerification implements ValidationRule
      * @param mixed $value
      * @param Closure $fail
      * @return void
+     * @throws ConnectionException
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $rawResponse = Http::asForm()->post($this->data->getUrl(), $this->buildData($value));
+        if($this->isNotString($value)) {
+            $fail('The :attribute must be a string.');
+
+            return;
+        }
+
+        $rawResponse = Http::asForm()
+            ->post($this->data->getUrl(), $this->buildData($value));
 
         if(! $rawResponse->successful()){
             $fail($this->data->getErrorMessage('invalid-request'));
+
+            return;
         }
 
         $response = $rawResponse->json();
 
-        if(! $response['success']){
-            $errorCode = isset($response['error-codes']) ?
-                $response['error-codes'][0] :
-                'default';
+        if($this->hasFailed($response)){
+            $fail($this->data->getErrorMessage($this->getErrorCode($response)));
 
-            $fail($this->data->getErrorMessage($errorCode));
+            return;
         }
 
         if($this->scoreSurpassed($response)){
@@ -52,7 +61,18 @@ class CaptchaVerification implements ValidationRule
     }
 
     /**
-     * This builds the data to make a POST request to CAPTCHA.
+     * Check if the value is not a string.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    private function isNotString(mixed $value): bool
+    {
+        return ! is_string($value);
+    }
+
+    /**
+     * Builds the data to make a POST request to Captcha.
      *
      * @param string $value
      * @return array
@@ -67,7 +87,32 @@ class CaptchaVerification implements ValidationRule
     }
 
     /**
-     * If it is CAPTCHA V3, it will check if the score is lower
+     * Check if Captcha response has failed
+     *
+     * @param array $response
+     * @return bool
+     */
+    private function hasFailed(array $response): bool
+    {
+        return isset($response['success']) &&
+            ! $response['success'];
+    }
+
+    /**
+     * Gets the proper error code.
+     *
+     * @param array $response
+     * @return string
+     */
+    private function getErrorCode(array $response): string
+    {
+        return ! empty($response['error-codes']) ?
+            $response['error-codes'][0] :
+            'default';
+    }
+
+    /**
+     * If it is Captcha V3, it will check if the score is lower
      * than the threshold.
      *
      * @param array $response
@@ -75,6 +120,7 @@ class CaptchaVerification implements ValidationRule
      */
     private function scoreSurpassed(array $response): bool
     {
-        return isset($response['score']) && $response['score'] < $this->data->getThreshold();
+        return isset($response['score']) &&
+            $response['score'] < $this->data->getThreshold();
     }
 }

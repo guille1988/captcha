@@ -7,21 +7,21 @@ use Illuminate\Support\Facades\File;
 final class Data
 {
 
-    // This has the file name of the config file.
+    // Has the file name of the config file.
     private string $configFileName = 'captcha.php';
 
-    // This contains the path of the config file if it was published.
+    // Contains the path of the config file if it was published.
     private string $publishPath;
 
-    // This contains the source of the config file.
+    // Contains the source of the config file.
     private string $sourcePath;
 
-    // This has the config file, whether it was published or not.
+    // Has the config file, whether it was published or not.
     private array $config;
 
 
     /**
-     * This method charges all the necessary attributes to make the package work.
+     * Charges all the necessary attributes to make the package work.
      */
     public function __construct()
     {
@@ -33,7 +33,7 @@ final class Data
     }
 
     /**
-     * This gets the path of the config file, if it was published or not.
+     * Gets the path of the config file, if it was published or not.
      *
      * @param string $publishPath
      * @param string $sourcePath
@@ -45,7 +45,7 @@ final class Data
     }
 
     /**
-     * This gets config file name.
+     * Gets config file name.
      *
      * @return string
      */
@@ -56,7 +56,7 @@ final class Data
 
 
     /**
-     * This gets source config file path.
+     * Gets source config file path.
      *
      * @return string
      */
@@ -67,7 +67,7 @@ final class Data
 
 
     /**
-     * This gets published config file path.
+     * Gets published config file path.
      *
      * @return string
      */
@@ -77,7 +77,7 @@ final class Data
     }
 
     /**
-     * This gets the URL from the proper config.
+     * Gets the URL from the proper config.
      *
      * @return string
      */
@@ -87,7 +87,7 @@ final class Data
     }
 
     /**
-     * This gets the threshold from the proper config (Only for CAPTCHA V3).
+     * Gets the threshold from the proper config (Only for Captcha V3).
      *
      * @return float
      */
@@ -101,8 +101,8 @@ final class Data
     }
 
     /**
-     * This gets secret key or test secret key, according to the config file and if the application
-     * is in production or not.
+     * Gets secret key or test secret key, according to the
+     * config file and if the application is in production or not.
      *
      * @return string|NULL
      */

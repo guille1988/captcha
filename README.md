@@ -2,7 +2,7 @@
 
 ## What it does:
 
-This package allows you to integrate CAPTCHA V2 or V3 to your Laravel application.
+This package allows you to integrate Captcha V2 or V3 to your Laravel application.
 
 ## Installation:
 
@@ -26,7 +26,7 @@ Config file named captcha.php is published in config folder of root directory. O
     | Secret Key
     |--------------------------------------------------------------------------
     |
-    | This is the CAPTCHA key that only back-end has.
+    | This is the Captcha key that only back-end has.
     |
     */
 
