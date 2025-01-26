@@ -108,11 +108,9 @@ final class Data
      */
     public function getSecretKey(): ?string
     {
-        $secretKey = $this->config['secret_key'];
-
         return empty($this->config['enable_test_key']) ?
-            $secretKey :
-            (app()->isProduction() ? $secretKey : $this->config['test_secret_key']);
+            $this->config['secret_key'] :
+            (app()->isProduction() ? $this->config['secret_key'] : $this->config['test_secret_key']);
     }
 
     /**
@@ -124,8 +122,7 @@ final class Data
      */
     public function getErrorMessage(string $errorCode): string
     {
-        $errorCodes = $this->config['error_codes'];
-
-        return $errorCodes[$errorCode] ?? $errorCodes['default'];
+        return ($errorCodes = $this->config['error_codes'])[$errorCode] ??
+            $errorCodes['default'];
     }
 }

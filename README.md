@@ -35,7 +35,7 @@ Config file named captcha.php is published in config folder of root directory. O
 
 There are three ways of captcha service integration, assuming $captcha is the field where front-end sends captcha response:
 
-### Form request way:
+### Form request:
 
 ```php
     use Felipetti\Captcha\Rule\CaptchaVerification;
@@ -48,7 +48,7 @@ There are three ways of captcha service integration, assuming $captcha is the fi
     }
 ```
 
-### Request validation way:
+### Request validation:
 
 Let's suppose we have a captcha controller, and we want to make validation inside:
 
@@ -69,7 +69,7 @@ class CaptchaController extends Controller
 }
 ```
 
-### Validator way:
+### Validator:
 
 ```php
 use Felipetti\Captcha\Rule\CaptchaVerification;

@@ -3,8 +3,10 @@
 namespace Felipetti\Captcha\Rule;
 
 use Closure;
+use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Felipetti\Captcha\ValueObject\Data;
 
@@ -38,25 +40,15 @@ class CaptchaVerification implements ValidationRule
             return;
         }
 
-        $rawResponse = Http::asForm()
-            ->post($this->data->getUrl(), $this->buildData($value));
+        $errorCode = match(true){
+            ! ($rawResponse = $this->makeRequest($value))->successful() => 'invalid-request',
+            $this->hasFailed($response = $rawResponse->json()) => $this->getErrorCode($response),
+            $this->scoreSurpassed($response) => 'threshold-surpassed',
+            default => null,
+        };
 
-        if(! $rawResponse->successful()){
-            $fail($this->data->getErrorMessage('invalid-request'));
-
-            return;
-        }
-
-        $response = $rawResponse->json();
-
-        if($this->hasFailed($response)){
-            $fail($this->data->getErrorMessage($this->getErrorCode($response)));
-
-            return;
-        }
-
-        if($this->scoreSurpassed($response)){
-            $fail($this->data->getErrorMessage('threshold-surpassed'));
+        if(is_string($errorCode)) {
+            $fail($this->data->getErrorMessage($errorCode));
         }
     }
 
@@ -69,6 +61,16 @@ class CaptchaVerification implements ValidationRule
     private function isNotString(mixed $value): bool
     {
         return ! is_string($value);
+    }
+
+    /**
+     * @param string $value
+     * @return PromiseInterface|Response
+     * @throws ConnectionException
+     */
+    private function makeRequest(string $value): PromiseInterface|Response
+    {
+        return Http::asForm()->post($this->data->getUrl(), $this->buildData($value));
     }
 
     /**
